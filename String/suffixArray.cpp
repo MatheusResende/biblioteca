@@ -20,7 +20,7 @@ vi build(string const& s){
     }
     vi pn(n), cn(n);
     for (int h = 0; (1 << h) < n; ++h) {
-        for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n; i++) {
             pn[i] = p[i] - (1 << h);
             if (pn[i] < 0)
                 pn[i] += n;
@@ -51,4 +51,20 @@ vi sa(string s) {
     vi v = build(s);
     v.erase(v.begin());
     return v;
+}
+
+vi kasai(string s, vi sa){
+    int n=s.size(),k=0;
+    vi lcp(n,0);
+    vi rank(n,0);
+
+    for(int i=0; i<n; i++) rank[sa[i]]=i;
+
+    for(int i=0; i<n; i++, k?k--:0){
+        if(rank[i]==n-1) {k=0; continue;}
+        int j=sa[rank[i]+1];
+        while(i+k<n && j+k<n && s[i+k]==s[j+k]) k++;
+        lcp[rank[i]]=k;
+    }
+    return lcp;
 }

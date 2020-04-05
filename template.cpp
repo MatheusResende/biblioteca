@@ -9,7 +9,8 @@ typedef long long int ll;
 typedef pair<int, int> ii;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
-
+typedef vector<ii> vii;
+typedef vector<vii> vvii;
 
 
 int main(){
