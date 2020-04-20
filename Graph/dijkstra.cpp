@@ -5,7 +5,7 @@ vi dijkstra(int s, vvii &g){
 	priority_queue<ii> q;
 	q.push(ii(0, s));
 	while(!q.empty()){
-		int dist = q.top().first;
+		int dist = -q.top().first;
 		int u = q.top().second;
 		q.pop();
 		if(dist > d[u])continue;

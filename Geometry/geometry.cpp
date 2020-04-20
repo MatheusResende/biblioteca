@@ -36,6 +36,30 @@ double sqrSegpointDist(seg s, pt c){
 	return (pt::cross(s.first, s.second, c) * pt::cross(s.first, s.second, c)) * 1.0 / pt::sqrdist(s.first,s.second);
 }
 
+bool onSegment(pt p, seg s){
+	return (sqrSegpointDist(s, p) < EPS);
+}
+
+bool intersects(seg s1, seg s2){
+	double o1 = pt::cross(s1.f, s2.f, s1.s);
+	double o2 = pt::cross(s1.f, s2.s, s1.s);
+	double o3 = pt::cross(s2.f, s1.f, s2.s);
+	double o4 = pt::cross(s2.f, s1.s, s2.s);
+	if(o1 * o2 < -EPS && o3 * o4 < -EPS) return true;
+	if(abs(o1) < EPS && onSegment(s2.f, s1)) return true;
+	if(abs(o2) < EPS && onSegment(s2.s, s1)) return true;
+	if(abs(o3) < EPS && onSegment(s1.f, s1)) return true;
+	if(abs(o4) < EPS && onSegment(s1.f, s1)) return true;
+	return false;
+}
+
+pt findIntersection(seg a, seg b){
+	double a1 = a.second.y - a.first.y , b1 = a.first.x - a.second.x, c1 =  a1 * a.first.x + b1 * a.first.y;
+	double a2 = b.second.y - b.first.y , b2 = b.first.x - b.second.x, c2 =  a2 * b.first.x + b2 * b.first.y;
+	double det = a1 * b2 - a2 * b1;
+	return pt( (b2 * c1 - b1 * c2) / det, (a1 * c2 - a2 * c1) / det);
+}
+
 //Determine if a point is inside a convex polygon
 //O(log(n))
 //v is a convexHull with v[0] having the smallest x

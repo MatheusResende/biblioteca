@@ -1,5 +1,5 @@
 //MillerRabin
-//Complexity O(log^3 n)
+//Complexity O(log n)
 //If n is 32bit use just the first four values of a
 typedef unsigned long long int ull;
 
