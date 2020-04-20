@@ -94,7 +94,7 @@ vector<pt> convexHull(vector<pt> &vet){
 		while (k >= t && pt::cross(H[k - 2], H[k - 1], vet[i]) < EPS) k--;
 		H[k++] = vet[i];
 	}
-	H.resize(k-1);
+	H.resize(k);
 	return H;
 }
 
