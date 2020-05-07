@@ -11,7 +11,7 @@ typedef vector<int> vi;
 typedef vector<vi> vvi;
 typedef vector<ii> vii;
 typedef vector<vii> vvii;
-
+typedef unsigned long long ull;
 
 int main(){
 	ios::sync_with_stdio(0);

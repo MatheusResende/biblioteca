@@ -1,16 +1,38 @@
-const int S = 800;//Block size
+const int N = (1 << 20);
+
+//MO
+//O(n * sqrt(q) * T + q * (logq + logn)), where T is update cost
+
+ll hilbert(int x, int y) {
+	ll rx, ry, s, d = 0;
+	for (s = N/2; s>0; s /= 2) {
+		rx = (x & s) > 0;
+		ry = (y & s) > 0;
+		d += s * s * ((3 * rx) ^ ry);
+		if (ry == 0) {
+			if (rx == 1) {
+				x = N-1 - x;
+				y = N-1 - y;
+			}
+			swap(x, y);
+		}
+	}
+	return d;
+}
 
 struct Query{
-	int l, int r, int idx;
-	bool operator<(Query q)const{
-		return ii(l / S, r) < ii(q.l / S, q.r);
+	int l, r, idx;
+	ll h;
+	Query(int l, int r, int idx): l(l), r(r), idx(idx), h(hilbert(l, r)){}
+	bool operator<(const Query &q)const{
+		return h < q.h;
 	}
  };
  
  vi MO(vector<Query> queries){
 	int l = 0, r = -1;
 	vi ans(queries.size());
-	sort(queries.begin, queries.end());
+	sort(queries.begin(), queries.end());
 	for(auto q: queries){
 		while(q.l < l)add(--l);
 		while(r < q.r)add(++r);

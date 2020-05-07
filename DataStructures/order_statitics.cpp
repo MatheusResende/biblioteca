@@ -1,9 +1,7 @@
 #include <ext/pb_ds/assoc_container.hpp> 
 #include <ext/pb_ds/tree_policy.hpp>
-using namespace std;
 using namespace __gnu_pbds;
-typedef long long int ll;
-typedef pair<int, int> ii;
+
 typedef tree<
 	int,
 	null_type,
@@ -16,4 +14,5 @@ ordered_set;
 ordered_set os;
 os.insert(int x);//inserts x
 os.size();//size
-os.order_of_key(int key)//index that contains key
+os.order_of_key(int key);//index that contains key
+*s.find_by_order(k);// find element with given order

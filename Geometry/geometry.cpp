@@ -25,6 +25,7 @@ struct pt{
 	static coord_t dot(const pt &p1, const pt &p2, const pt &p3){return dot(p2-p1, p3-p1);}
 	static coord_t cross(const pt &v1, const pt &v2){return v1.x * v2.y - v1.y * v2.x;}
 	static coord_t cross(const pt &p1, const pt &p2, const pt &p3){return cross(p2-p1, p3-p1);}
+	static pt rotate90degrees(const pt p){return pt(-p.y, p.x);}
 };
 
 typedef pair<pt, pt> seg;
