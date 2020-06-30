@@ -13,11 +13,19 @@ typedef vector<ii> vii;
 typedef vector<vii> vvii;
 typedef unsigned long long ull;
 
+void test_case(){
+	
+	
+}
+
 int main(){
 	ios::sync_with_stdio(0);
 	cin.tie(0); 
-	
-	
-	
+	int t = 1;
+	cin >> t;
+	for(int i = 1; i <= t; i++){
+		//cout << "Case #"<< i << ":" << endl;
+		test_case();
+	}
 	return 0;
 }

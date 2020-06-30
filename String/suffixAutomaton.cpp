@@ -3,7 +3,7 @@ struct state {
 	map<char,int> next;
 };
 
-state st[MAX];
+state st[2 * MAX];
 int sz, last;
 
 void init(){

@@ -1,6 +1,6 @@
 //geometry
-//typedef ll coord_t;
-typedef double coord_t;
+typedef ll coord_t;
+//typedef double coord_t;
 
 struct pt{
 	coord_t x, y;
@@ -28,35 +28,55 @@ struct pt{
 	static pt rotate90degrees(const pt p){return pt(-p.y, p.x);}
 };
 
-typedef pair<pt, pt> seg;
+struct seg{
+	pt p, q;
+	int id;
+	seg(){}
+	seg(pt p, pt q): p(p), q(q){}
+	seg(pt p, pt q, int id): p(p), q(q), id(id){}
+	double get_y(double x) const {
+        if (abs(p.x - q.x) < EPS)
+            return p.y;
+        return p.y +(q.y - p.y) * (x-p.x) / (q.x - p.x);
+    }
+};
 
-double sqrSegpointDist(seg s, pt c){
-	if(s.first == s.second) return pt::sqrdist(s.first,c);
-	if(pt::dot(s.first, s.second, c) <= EPS)return pt::sqrdist(s.first,c);
-	if(pt::dot(s.second, s.first, c) <= EPS)return pt::sqrdist(s.second,c);
-	return (pt::cross(s.first, s.second, c) * pt::cross(s.first, s.second, c)) * 1.0 / pt::sqrdist(s.first,s.second);
+bool operator<(const seg& a, const seg& b){
+    double x = max(min(a.p.x, a.q.x), min(b.p.x, b.q.x));
+    return a.get_y(x) < b.get_y(x) - EPS;
+}
+
+double SegpointDist(seg s, pt c){
+	if(s.p == s.q) return sqrt(pt::sqrdist(s.p,c));
+	if(pt::dot(s.p, s.q, c) < EPS)return sqrt(pt::sqrdist(s.p,c));
+	if(pt::dot(s.q, s.p, c) < EPS)return sqrt(pt::sqrdist(s.q,c));
+	return pt::cross(s.p, s.q, c) / sqrt(pt::sqrdist(s.p,s.q));
 }
 
 bool onSegment(pt p, seg s){
-	return (sqrSegpointDist(s, p) < EPS);
+	return (SegpointDist(s, p) < EPS);
 }
 
-bool intersects(seg s1, seg s2){
-	double o1 = pt::cross(s1.f, s2.f, s1.s);
-	double o2 = pt::cross(s1.f, s2.s, s1.s);
-	double o3 = pt::cross(s2.f, s1.f, s2.s);
-	double o4 = pt::cross(s2.f, s1.s, s2.s);
-	if(o1 * o2 < -EPS && o3 * o4 < -EPS) return true;
-	if(abs(o1) < EPS && onSegment(s2.f, s1)) return true;
-	if(abs(o2) < EPS && onSegment(s2.s, s1)) return true;
-	if(abs(o3) < EPS && onSegment(s1.f, s1)) return true;
-	if(abs(o4) < EPS && onSegment(s1.f, s1)) return true;
-	return false;
+bool intersect1d(coord_t l1, coord_t r1, coord_t l2, coord_t r2) {
+    if (l1 > r1) swap(l1, r1);
+    if (l2 > r2) swap(l2, r2);
+    return max(l1, l2) <= min(r1, r2) + EPS;
+}
+
+int sgn(double x) {
+    return abs(x) < EPS ? 0 : x > 0 ? +1 : -1;
+}
+
+bool intersects(const seg& a, const seg& b){
+    return intersect1d(a.p.x, a.q.x, b.p.x, b.q.x) &&
+           intersect1d(a.p.y, a.q.y, b.p.y, b.q.y) &&
+           sgn(pt::cross(a.p, a.q, b.p)) * sgn(pt::cross(a.p, a.q, b.q)) <= 0 &&
+           sgn(pt::cross(b.p, b.q, a.p)) * sgn(pt::cross(b.p, b.q, a.q)) <= 0;
 }
 
 pt findIntersection(seg a, seg b){
-	double a1 = a.second.y - a.first.y , b1 = a.first.x - a.second.x, c1 =  a1 * a.first.x + b1 * a.first.y;
-	double a2 = b.second.y - b.first.y , b2 = b.first.x - b.second.x, c2 =  a2 * b.first.x + b2 * b.first.y;
+	double a1 = a.q.y - a.p.y , b1 = a.p.x - a.q.x, c1 =  a1 * a.p.x + b1 * a.p.y;
+	double a2 = b.q.y - b.p.y , b2 = b.p.x - b.q.x, c2 =  a2 * b.p.x + b2 * b.p.y;
 	double det = a1 * b2 - a2 * b1;
 	return pt( (b2 * c1 - b1 * c2) / det, (a1 * c2 - a2 * c1) / det);
 }
@@ -67,7 +87,7 @@ pt findIntersection(seg a, seg b){
 //Do not addimits colinear points on convex hull
 bool isInside(vector<pt> &v, pt p){
 	int n = v.size();
-	if(sqrSegpointDist(seg(v[0], v[n - 1]), p) < EPS) return true;
+	if(SegpointDist(seg(v[0], v[n - 1]), p) < EPS) return true;
 	if(pt::cross(v[0], v[n - 1], p) > -EPS || pt::cross(v[0], v[1], p) < -EPS)return false;
 	int l = 1, r = n - 2;
 	while(l < r){
@@ -95,7 +115,7 @@ vector<pt> convexHull(vector<pt> &vet){
 		while (k >= t && pt::cross(H[k - 2], H[k - 1], vet[i]) < EPS) k--;
 		H[k++] = vet[i];
 	}
-	H.resize(k);
+	H.resize(k-1);
 	return H;
 }
 
@@ -106,4 +126,42 @@ double area(vector<pt> &h){
 	for(int i = 1; i < h.size(); i++)
 		res += h[i-1].x * h[i].y - h[i].x * h[i-1].y;
 	return abs(res)/2;
+}
+
+//Given a set of segments search for two segments which intersects
+//O(n log n)
+ii findIntersection(vector<seg> v){
+	int n = v.size();
+	vector<tuple<int, int, int>> event(2 * n);
+	for(int i = 0; i < n; i++){
+		v[i].id = i;
+		event[2*i]   = {min(v[i].p.x, v[i].q.x), 0, i};
+		event[2*i+1] = {max(v[i].p.x, v[i].q.x), 1, i};
+	}
+	sort(event.begin(), event.end());
+	
+	set<seg> s;
+	vector<set<seg>::iterator> where(n);
+	auto prev = [&](set<seg>::iterator it){
+		return it == s.begin() ? s.end() : --it;
+	};
+	auto next = [&](set<seg>::iterator it){
+		return ++it;
+	};
+	for(auto e: event){
+		int t = get<1>(e);
+		int id = get<2>(e);
+		if(t){
+			set<seg>::iterator nxt = next(where[id]), prv = prev(where[id]);
+			if(nxt != s.end() && prv != s.end() && intersects(*nxt, *prv))return {nxt->id, prv->id};
+			s.erase(v[id]);
+		}
+		else{
+			set<seg>::iterator nxt = s.lower_bound(v[id]), prv = prev(nxt);
+			if(nxt != s.end() && intersects(*nxt, v[id])) return {nxt->id, id};
+			if(prv != s.end() && intersects(*prv, v[id])) return {prv->id, id};
+			where[id] = s.insert(nxt, v[id]);
+		}
+	}
+	return {-1, -1};
 }
