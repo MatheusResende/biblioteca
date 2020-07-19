@@ -4,13 +4,10 @@ struct HLD{
 	vvi g;
 	int n, t = 1;
 	
-	HLD(vvi g){
-		n = g.size();
-		sz = vi(n), in = vi(n), nxt = vi(n), p = vi(n), h = vi(n);
+	HLD(vvi g): n(g.size()), in(n), nxt(n), p(n), h(n), seg(n + 1){
 		nxt[1] = 1;
 		dfs_sz(1, g);
 		dfs_hld(1, g);
-		seg = segTree(n + 1);
 	}
 	
 	void dfs_sz(int u, vvi &g) {
@@ -35,34 +32,21 @@ struct HLD{
 		}
 	}
 
-	int query_Update(int a, int b, bool isquery, int v = 0){
-		if(isquery) return seg.query(1, 1, n, a, b);
-		seg.update(1, 1, n, a, b, v);
-		return 0;
+	void update(int a, int b, int v){
+		if(h[a] < h[b]) swap(a, b);
+		if(nxt[a] == nxt[b]){
+			if(in[b] < in[a])swap(a, b);
+			if(in[a] != in[b]) seg.update(1, 1, n, in[a]+1, in[b], v);
+		}
+		else seg.update(1, 1, n, in[nxt[a]], in[a], v), update(p[nxt[a]], b, v);
 	}
 
-	int query(int a, int b, bool isQuery = true, int v = 0){
-		int res = 0;
-		if(h[a] < h[b])
-			swap(a, b);
-		while(h[a] > h[b]){
-			res = max(res, query_Update(in[nxt[a]], in[a], isQuery, v));
-			a = p[nxt[a]];
+	int query(int a, int b){
+		if(h[a] < h[b]) swap(a, b);
+		if(nxt[a] == nxt[b]){
+			if(in[b] < in[a])swap(a, b);
+			return (in[a] != in[b])? seg.query(1, 1, n, in[a]+1, in[b]): 0;
 		}
-		while(nxt[a] != nxt[b]){
-			res = max(res, query_Update(in[nxt[a]], in[a], isQuery, v));
-			a = p[nxt[a]];
-			res = max(res, query_Update(in[nxt[b]], in[b], isQuery, v));
-			b = p[nxt[b]];
-		}
-		if(in[a] != in[b]){//Query and update on edge
-			if(in[b] < in[a]) swap(a, b);
-			res = max(res, query_Update(in[a] + 1, in[b], isQuery, v));
-		}
-		return res;
-	}
-	
-	void update(int a, int b, int v){
-		query(a, b, false, v);
+		return max(seg.query(1, 1, n, in[nxt[a]], in[a]), query(p[nxt[a]], b));
 	}
 };

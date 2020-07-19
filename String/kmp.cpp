@@ -6,7 +6,8 @@ vi preprocess(string &S){
 	while(i < S.size()){
 		while(j > 0 && S[i] != S[j]) j = p[j - 1];
 		if(S[i] == S[j] && i != j) j++;
-		p[i++] = j;
+		if(i < S.size()-1 && S[i+1] == S[j])p[i++] = p[j];
+		else p[i++] = j;
 	}
 	return p;
 }
